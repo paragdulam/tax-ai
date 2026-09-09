@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaxShield AI</title>
+    <link rel="stylesheet" href="styles/tailwind.css" />
+  </head>
+
+  <body class="bg-surface text-on-surface font-body-sm antialiased h-screen overflow-hidden flex selection:bg-primary-container selection:text-on-primary-container">
+    <!-- SideNavBar -->
+    <nav class="bg-surface-container-lowest border-r border-outline-variant fixed left-0 top-0 h-full w-[260px] flex flex-col py-6 z-20">
+      <div class="px-6 mb-8 flex items-center gap-3">
+        <div class="w-10 h-10 rounded bg-primary flex items-center justify-center text-on-primary">
+          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+        </div>
+        <div>
+          <h1 class="text-title-lg font-title-lg font-bold text-primary">TaxShield AI</h1>
+          <p class="text-label-caps font-label-caps text-on-surface-variant uppercase">Precision Tax Mgmt</p>
+        </div>
+      </div>
+      <div class="flex-1 overflow-y-auto custom-scrollbar px-2">
+        <ul class="space-y-1" id="nav-links">
+          <li>
+            <a href="#" data-view="dashboard" class="nav-link flex items-center gap-3 px-4 py-2 transition-colors duration-150 rounded">
+              <span class="material-symbols-outlined text-[20px] nav-icon">dashboard</span>
+              <span class="text-body-sm font-body-sm">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" data-view="statements" class="nav-link flex items-center gap-3 px-4 py-2 transition-colors duration-150 rounded">
+              <span class="material-symbols-outlined text-[20px] nav-icon">description</span>
+              <span class="text-body-sm font-body-sm">Statements</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" data-view="review" class="nav-link flex items-center gap-3 px-4 py-2 transition-colors duration-150 rounded">
+              <span class="material-symbols-outlined text-[20px] nav-icon">assignment_turned_in</span>
+              <span class="text-body-sm font-body-sm">Review</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" data-view="insights" class="nav-link flex items-center gap-3 px-4 py-2 transition-colors duration-150 rounded">
+              <span class="material-symbols-outlined text-[20px] nav-icon">insights</span>
+              <span class="text-body-sm font-body-sm">Insights</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="mt-auto px-2 pt-4 border-t border-outline-variant/50">
+        <ul class="space-y-1">
+          <li>
+            <a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 rounded" href="#">
+              <span class="material-symbols-outlined text-[20px]">settings</span>
+              <span class="text-body-sm font-body-sm">Settings</span>
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-150 rounded" href="#">
+              <span class="material-symbols-outlined text-[20px]">help</span>
+              <span class="text-body-sm font-body-sm">Support</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 flex flex-col ml-[260px] h-full">
+      <!-- TopNavBar -->
+      <header class="bg-surface-bright border-b border-outline-variant h-16 w-full flex items-center justify-between px-gutter sticky top-0 z-10 shrink-0">
+        <div class="flex items-center gap-4 flex-1">
+          <div class="relative w-full max-w-md group">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none group-focus-within:text-primary transition-colors">search</span>
+            <input id="search-input" class="w-full bg-surface-container-lowest border border-outline-variant rounded-sm py-1.5 pl-9 pr-3 text-body-sm font-body-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-shadow placeholder:text-on-surface-variant/70" placeholder="Search..." type="text" />
+          </div>
+        </div>
+        <div class="flex items-center gap-4 shrink-0">
+          <button aria-label="Notifications" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-sm transition-colors relative">
+            <span class="material-symbols-outlined">notifications</span>
+            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full ring-2 ring-surface-bright"></span>
+          </button>
+          <button aria-label="History" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-sm transition-colors">
+            <span class="material-symbols-outlined">history</span>
+          </button>
+          <div class="h-6 w-px bg-outline-variant mx-2"></div>
+          <button class="flex items-center gap-2 hover:bg-surface-container-low p-1 rounded-sm transition-colors">
+            <div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-outline-variant flex items-center justify-center text-on-surface-variant">
+              <span class="material-symbols-outlined text-[20px]">person</span>
+            </div>
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">expand_more</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Canvas -->
+      <main class="flex-1 flex flex-col overflow-y-auto custom-scrollbar p-margin-desktop bg-surface-bright relative">
+        <!-- ================= DASHBOARD VIEW ================= -->
+        <section data-view="dashboard" class="view max-w-[1600px] mx-auto w-full">
+          <header class="mb-8 flex justify-between items-end">
+            <div>
+              <h2 class="text-headline-lg font-headline-lg text-primary">Overview</h2>
+              <p class="text-body-lg font-body-lg text-on-surface-variant mt-1">Q3 Fiscal Summary</p>
+            </div>
+            <div class="flex gap-3">
+              <button class="px-4 py-2 bg-surface-container-lowest border border-outline-variant text-on-surface rounded hover:bg-surface-container-low transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">download</span>
+                <span class="text-label-caps font-label-caps">EXPORT</span>
+              </button>
+              <button class="px-4 py-2 bg-primary text-on-primary rounded hover:bg-inverse-surface transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">add</span>
+                <span class="text-label-caps font-label-caps">NEW ENTRY</span>
+              </button>
+            </div>
+          </header>
+
+          <div class="grid grid-cols-12 gap-gutter">
+            <!-- Estimated Tax Liability -->
+            <div class="col-span-12 xl:col-span-8 bg-surface-container-lowest border border-outline-variant p-6 rounded-lg">
+              <div class="flex justify-between items-center mb-6 border-b border-outline-variant pb-4">
+                <h3 class="text-title-sm font-title-sm text-primary">Estimated Tax Liability</h3>
+                <span class="px-2 py-1 bg-surface-container-high rounded text-label-caps font-label-caps text-on-surface-variant flex items-center gap-1">
+                  Q3 2023 <span class="material-symbols-outlined text-[14px]">close</span>
+                </span>
+              </div>
+              <div class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/3 flex flex-col justify-center">
+                  <p class="text-label-caps font-label-caps text-on-surface-variant mb-1 uppercase">Total Accrued</p>
+                  <p class="text-display-lg font-display-lg text-primary tracking-tight">$1.24M</p>
+                  <p class="text-body-sm font-body-sm text-success flex items-center gap-1 mt-2">
+                    <span class="material-symbols-outlined text-[16px]">arrow_downward</span>
+                    4.2% from last quarter
+                  </p>
+                </div>
+                <div class="md:w-2/3">
+                  <div class="flex justify-between text-label-caps font-label-caps text-on-surface-variant mb-2 border-b border-outline-variant pb-2">
+                    <span>CATEGORY</span>
+                    <span>AMOUNT</span>
+                  </div>
+                  <ul class="space-y-3 mt-4">
+                    <li class="flex justify-between items-center group cursor-default">
+                      <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-sm bg-primary"></div>
+                        <span class="text-body-sm font-body-sm">Federal Income</span>
+                      </div>
+                      <span class="text-mono-data font-mono-data group-hover:text-primary transition-colors">$850,000</span>
+                    </li>
+                    <li class="flex justify-between items-center group cursor-default">
+                      <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-sm bg-secondary"></div>
+                        <span class="text-body-sm font-body-sm">State &amp; Local</span>
+                      </div>
+                      <span class="text-mono-data font-mono-data group-hover:text-primary transition-colors">$240,000</span>
+                    </li>
+                    <li class="flex justify-between items-center group cursor-default">
+                      <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-sm bg-surface-tint"></div>
+                        <span class="text-body-sm font-body-sm">Payroll Taxes</span>
+                      </div>
+                      <span class="text-mono-data font-mono-data group-hover:text-primary transition-colors">$150,000</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Review Progress -->
+            <div class="col-span-12 xl:col-span-4 bg-surface-container-lowest border border-outline-variant p-6 rounded-lg flex flex-col">
+              <div class="flex justify-between items-center mb-6 border-b border-outline-variant pb-4">
+                <h3 class="text-title-sm font-title-sm text-primary">Review Progress</h3>
+                <button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+              </div>
+              <div class="flex-1 flex flex-col items-center justify-center py-4">
+                <div class="relative w-32 h-32 flex items-center justify-center">
+                  <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    <circle class="text-surface-container-highest" cx="50" cy="50" fill="none" r="45" stroke="currentColor" stroke-width="8"></circle>
+                    <circle class="text-primary" cx="50" cy="50" fill="none" r="45" stroke="currentColor" stroke-dasharray="282.7" stroke-dashoffset="70.67" stroke-linecap="round" stroke-width="8"></circle>
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span class="text-headline-lg font-headline-lg text-primary">75%</span>
+                  </div>
+                </div>
+                <p class="text-body-sm font-body-sm text-on-surface-variant mt-6 text-center">3 of 4 schedules approved.<br />Awaiting Final Sign-off.</p>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="col-span-12 xl:col-span-4 bg-surface-container-lowest border border-outline-variant p-6 rounded-lg">
+              <h3 class="text-title-sm font-title-sm text-primary mb-4 border-b border-outline-variant pb-4">Quick Actions</h3>
+              <div class="grid grid-cols-2 gap-4">
+                <button class="flex flex-col items-center justify-center p-4 bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-outline-variant rounded transition-all duration-200">
+                  <span class="material-symbols-outlined text-[24px] text-primary mb-2">upload_file</span>
+                  <span class="text-label-caps font-label-caps">Upload</span>
+                </button>
+                <button class="flex flex-col items-center justify-center p-4 bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-outline-variant rounded transition-all duration-200">
+                  <span class="material-symbols-outlined text-[24px] text-primary mb-2">fact_check</span>
+                  <span class="text-label-caps font-label-caps">Review</span>
+                </button>
+                <button class="flex flex-col items-center justify-center p-4 bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-outline-variant rounded transition-all duration-200">
+                  <span class="material-symbols-outlined text-[24px] text-primary mb-2">summarize</span>
+                  <span class="text-label-caps font-label-caps">Report</span>
+                </button>
+                <button class="flex flex-col items-center justify-center p-4 bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-outline-variant rounded transition-all duration-200">
+                  <span class="material-symbols-outlined text-[24px] text-primary mb-2">chat_bubble</span>
+                  <span class="text-label-caps font-label-caps">Ask AI</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="col-span-12 xl:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex flex-col">
+              <div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest z-10 sticky top-0">
+                <h3 class="text-title-sm font-title-sm text-primary">Recent Transactions</h3>
+                <button class="text-label-caps font-label-caps text-primary hover:underline">VIEW ALL</button>
+              </div>
+              <div class="flex-1 overflow-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead class="bg-surface-bright border-b border-outline-variant sticky top-0">
+                    <tr>
+                      <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant font-medium">DATE</th>
+                      <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant font-medium">DESCRIPTION</th>
+                      <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant font-medium">STATUS</th>
+                      <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant font-medium text-right">AMOUNT</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-body-sm font-body-sm">
+                    <tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+                      <td class="p-table-cell-padding text-mono-data font-mono-data text-on-surface-variant">2023-10-24</td>
+                      <td class="p-table-cell-padding">Q3 Estimated Payment</td>
+                      <td class="p-table-cell-padding"><span class="px-2 py-0.5 bg-secondary-container text-on-secondary-fixed text-label-caps font-label-caps rounded-sm">PROCESSING</span></td>
+                      <td class="p-table-cell-padding text-right text-mono-data font-mono-data">$125,000.00</td>
+                    </tr>
+                    <tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+                      <td class="p-table-cell-padding text-mono-data font-mono-data text-on-surface-variant">2023-10-18</td>
+                      <td class="p-table-cell-padding">State Withholding Adjustment</td>
+                      <td class="p-table-cell-padding"><span class="px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-label-caps font-label-caps rounded-sm">COMPLETED</span></td>
+                      <td class="p-table-cell-padding text-right text-mono-data font-mono-data">$42,300.50</td>
+                    </tr>
+                    <tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+                      <td class="p-table-cell-padding text-mono-data font-mono-data text-on-surface-variant">2023-10-12</td>
+                      <td class="p-table-cell-padding">Corporate Tax Filing Fee</td>
+                      <td class="p-table-cell-padding"><span class="px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-label-caps font-label-caps rounded-sm">COMPLETED</span></td>
+                      <td class="p-table-cell-padding text-right text-mono-data font-mono-data">$850.00</td>
+                    </tr>
+                    <tr class="hover:bg-surface-container-low transition-colors">
+                      <td class="p-table-cell-padding text-mono-data font-mono-data text-on-surface-variant">2023-10-05</td>
+                      <td class="p-table-cell-padding">Depreciation Schedule Review</td>
+                      <td class="p-table-cell-padding"><span class="px-2 py-0.5 bg-error-container text-on-error-container text-label-caps font-label-caps rounded-sm">FLAGGED</span></td>
+                      <td class="p-table-cell-padding text-right text-mono-data font-mono-data">-</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= STATEMENTS VIEW ================= -->
+        <section data-view="statements" class="view max-w-[1600px] mx-auto w-full hidden">
+          <div class="flex flex-col gap-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-headline-lg font-headline-lg text-on-surface mb-1">Statement Manager</h2>
+                <p class="text-body-sm font-body-sm text-on-surface-variant">Manage and process raw financial documents for FY-2023.</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <button id="delete-selected-btn" class="h-8 px-4 hidden items-center gap-2 border border-error text-error rounded bg-surface-container-lowest hover:bg-error-container transition-colors font-body-sm">
+                  <span class="material-symbols-outlined text-[18px]">delete</span>
+                  <span id="delete-selected-label">Delete</span>
+                </button>
+                <button id="browse-files-btn" class="h-8 px-4 flex items-center gap-2 bg-primary text-on-primary rounded hover:bg-primary/90 transition-colors font-body-sm shadow-sm">
+                  <span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+                  Upload Files
+                </button>
+                <input id="file-input" type="file" accept=".xlsx,.xls,.csv,.pdf" multiple class="hidden" />
+              </div>
+            </div>
+
+            <div id="statement-error" class="hidden bg-error-container text-on-error-container text-body-sm font-body-sm rounded px-4 py-2"></div>
+
+            <div class="grid grid-cols-12 gap-6">
+              <!-- Uploaded Files Table -->
+              <div class="col-span-12 xl:col-span-8 flex flex-col gap-6">
+                <div class="bg-surface-container-lowest border border-outline-variant rounded flex flex-col">
+                  <div class="p-4 border-b border-outline-variant flex items-center justify-between">
+                    <h3 class="text-title-sm font-title-sm">Uploaded Files</h3>
+                    <span id="statement-count-badge" class="bg-surface-container-high px-2 py-1 rounded text-mono-data-sm font-mono-data-sm text-on-surface-variant">0 Records</span>
+                  </div>
+
+                  <!-- Empty state -->
+                  <div id="statement-empty-state" class="flex flex-col items-center justify-center gap-2 py-16 px-4 text-center">
+                    <span class="material-symbols-outlined text-[32px] text-on-surface-variant">folder_off</span>
+                    <p class="text-body-sm font-body-sm font-medium">No statements uploaded yet</p>
+                    <p class="text-label-caps font-label-caps text-on-surface-variant">Drag a file into the upload area or browse to add your first statement</p>
+                  </div>
+
+                  <div id="statement-table-wrap" class="overflow-x-auto hidden">
+                    <table class="w-full text-left border-collapse">
+                      <thead>
+                        <tr class="bg-surface-bright border-b border-outline-variant">
+                          <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant uppercase w-10 text-center"><input id="select-all-checkbox" class="rounded-sm border-outline-variant text-primary focus:ring-primary w-3.5 h-3.5" type="checkbox" /></th>
+                          <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant uppercase w-[40%]">Document Name</th>
+                          <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant uppercase text-right">Upload Date</th>
+                          <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant uppercase text-right">Size</th>
+                          <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant uppercase">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody id="statement-table-body" class="text-body-sm font-body-sm divide-y divide-outline-variant"></tbody>
+                    </table>
+                  </div>
+                  <div id="statement-pagination" class="p-3 border-t border-outline-variant bg-surface-bright flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant hidden">
+                    <span id="statement-pagination-label">Showing 0 of 0</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column -->
+              <div class="col-span-12 xl:col-span-4 flex flex-col gap-6">
+                <div id="dropzone" class="bg-surface-container-lowest border border-outline-variant rounded border-dashed border-2 hover:border-primary transition-colors cursor-pointer group flex flex-col items-center justify-center p-8 text-center h-[200px]">
+                  <div class="w-12 h-12 rounded-full bg-surface-container-low group-hover:bg-primary-container flex items-center justify-center mb-3 transition-colors">
+                    <span class="material-symbols-outlined text-[24px] text-on-surface-variant group-hover:text-on-primary-container transition-colors">upload_file</span>
+                  </div>
+                  <h4 class="text-title-sm font-title-sm font-semibold mb-1">Drag &amp; Drop Documents</h4>
+                  <p class="text-body-sm font-body-sm text-on-surface-variant mb-4">Support Excel (.xlsx, .xls), CSV, and PDF formats up to 50MB</p>
+                  <button id="browse-files-dropzone-btn" class="h-8 px-4 bg-surface-container-low hover:bg-surface-container text-on-surface rounded text-body-sm font-body-sm transition-colors border border-outline-variant">Browse Files</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= REVIEW VIEW ================= -->
+        <section data-view="review" class="view max-w-[1600px] mx-auto w-full hidden flex-1 flex flex-col min-h-0">
+          <div class="mb-8 flex items-center justify-between">
+            <div>
+              <h2 class="text-headline-lg font-headline-lg text-on-surface mb-1">Transaction Review</h2>
+              <p class="text-body-sm font-body-sm text-on-surface-variant">Categorize and verify recent ledger entries.</p>
+            </div>
+            <div class="flex gap-2">
+              <button class="flex items-center gap-2 px-4 py-2 border border-outline-variant rounded text-body-sm font-body-sm font-semibold hover:bg-surface-container-low transition-colors">
+                <span class="material-symbols-outlined text-[18px]">download</span>
+                Export
+              </button>
+              <button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded text-body-sm font-body-sm font-semibold hover:bg-surface-tint transition-colors">
+                <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                Mark All Reviewed
+              </button>
+            </div>
+          </div>
+
+          <div class="mb-6 flex gap-2">
+            <button class="px-3 py-1.5 bg-surface-container-high text-on-surface rounded text-body-sm font-body-sm font-semibold border border-transparent">All Transactions</button>
+            <button class="px-3 py-1.5 bg-surface-container-lowest text-on-surface-variant border border-outline-variant rounded text-body-sm font-body-sm hover:bg-surface-container-low transition-colors">Uncategorized (12)</button>
+            <button class="px-3 py-1.5 bg-surface-container-lowest text-on-surface-variant border border-outline-variant rounded text-body-sm font-body-sm hover:bg-surface-container-low transition-colors">Business</button>
+            <button class="px-3 py-1.5 bg-surface-container-lowest text-on-surface-variant border border-outline-variant rounded text-body-sm font-body-sm hover:bg-surface-container-low transition-colors">Personal</button>
+          </div>
+
+          <div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
+            <div id="review-empty-state" class="hidden flex-1 flex flex-col items-center justify-center gap-2 py-16 px-4 text-center">
+              <span class="material-symbols-outlined text-[32px] text-on-surface-variant">receipt_long</span>
+              <p class="text-body-sm font-body-sm font-medium">No transactions yet</p>
+              <p class="text-label-caps font-label-caps text-on-surface-variant">Upload a statement on the Statements screen to see transactions here</p>
+            </div>
+            <div id="review-table-wrap" class="overflow-auto flex-1">
+              <table class="w-full text-left border-collapse">
+                <thead class="bg-surface-container-low border-b border-outline-variant sticky top-0">
+                  <tr>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant w-12"><input class="rounded-sm border-outline-variant text-primary focus:ring-primary" type="checkbox" /></th>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant">Date</th>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant">Merchant / Description</th>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant">Suggested Category</th>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant text-right">Amount</th>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant text-center">Classification</th>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant w-12"></th>
+                  </tr>
+                </thead>
+                <tbody id="review-table-body" class="text-body-sm font-body-sm divide-y divide-outline-variant"></tbody>
+              </table>
+            </div>
+            <div class="p-4 border-t border-outline-variant bg-surface-bright flex items-center justify-between shrink-0">
+              <span id="review-pagination-label" class="text-body-sm font-body-sm text-on-surface-variant">Showing 0 of 0 transactions</span>
+              <div class="flex gap-1">
+                <button id="review-prev-btn" class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-sm text-on-surface-variant hover:bg-surface-container-low disabled:opacity-50" disabled>
+                  <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                </button>
+                <button id="review-next-btn" class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded-sm text-on-surface-variant hover:bg-surface-container-low disabled:opacity-50" disabled>
+                  <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= INSIGHTS VIEW ================= -->
+        <section data-view="insights" class="view max-w-[1600px] mx-auto w-full hidden">
+          <div class="flex justify-between items-end mb-2">
+            <div>
+              <h2 class="text-headline-lg font-headline-lg text-primary">Deep Dive Analytics</h2>
+              <p class="text-body-sm font-body-sm text-on-surface-variant mt-1">FY 2023 Tax Liability Estimation &amp; Review</p>
+            </div>
+            <div class="flex gap-3">
+              <button class="flex items-center gap-2 px-4 py-2 border border-outline-variant bg-transparent text-primary text-body-sm font-body-sm rounded hover:bg-surface-container-low transition-colors">
+                <span class="material-symbols-outlined text-[18px]">download</span>
+                Export Report
+              </button>
+              <button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary text-body-sm font-body-sm rounded hover:bg-inverse-surface transition-colors">
+                <span class="material-symbols-outlined text-[18px]">tune</span>
+                Adjust Parameters
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 gap-4 mt-6">
+            <div class="col-span-12 md:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-lg p-5 flex flex-col justify-between">
+              <div class="flex justify-between items-start mb-4">
+                <h3 class="text-label-caps font-label-caps text-on-surface-variant uppercase">Total Gross Income</h3>
+                <span class="material-symbols-outlined text-success">trending_up</span>
+              </div>
+              <div>
+                <div class="text-display-lg font-display-lg text-primary font-mono-data tracking-tight">$4,250,890</div>
+                <div class="flex items-center gap-2 mt-2">
+                  <span class="px-2 py-0.5 bg-surface-container-high rounded text-mono-data-sm font-mono-data-sm text-success">+12.4% YoY</span>
+                  <span class="text-body-sm font-body-sm text-on-surface-variant">vs $3.78M (FY22)</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-span-12 md:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-lg p-5 flex flex-col justify-between">
+              <div class="flex justify-between items-start mb-4">
+                <h3 class="text-label-caps font-label-caps text-on-surface-variant uppercase">Deductible Expenses</h3>
+                <span class="material-symbols-outlined text-warning">receipt_long</span>
+              </div>
+              <div>
+                <div class="text-display-lg font-display-lg text-primary font-mono-data tracking-tight">$1,105,420</div>
+                <div class="flex items-center gap-2 mt-2">
+                  <span class="px-2 py-0.5 bg-surface-container-high rounded text-mono-data-sm font-mono-data-sm text-warning">+4.2% YoY</span>
+                  <span class="text-body-sm font-body-sm text-on-surface-variant">26% of Gross Income</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-span-12 md:col-span-4 bg-primary border border-primary rounded-lg p-5 flex flex-col justify-between relative overflow-hidden">
+              <div class="absolute top-0 right-0 w-32 h-32 bg-data-blue opacity-20 blur-[50px] rounded-full translate-x-1/2 -translate-y-1/2"></div>
+              <div class="flex justify-between items-start mb-4 relative z-10">
+                <h3 class="text-label-caps font-label-caps text-on-primary-fixed-variant uppercase">TaxShield AI Confidence</h3>
+                <span class="material-symbols-outlined text-on-primary">model_training</span>
+              </div>
+              <div class="relative z-10">
+                <div class="flex items-baseline gap-2">
+                  <div class="text-display-lg font-display-lg text-on-primary font-mono-data tracking-tight">98.7</div>
+                  <div class="text-title-lg font-title-lg text-on-primary-fixed-variant">%</div>
+                </div>
+                <div class="flex items-center gap-2 mt-2">
+                  <span class="w-2 h-2 rounded-full bg-success"></span>
+                  <span class="text-body-sm font-body-sm text-on-primary-fixed-variant">Based on 14,205 processed documents</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 gap-4 mt-4">
+            <div class="col-span-12 lg:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-lg p-5">
+              <div class="flex justify-between items-center mb-6">
+                <h3 class="text-title-sm font-title-sm text-primary">Expense Categorization</h3>
+                <div class="flex gap-2">
+                  <button class="px-3 py-1 bg-surface-container-low text-body-sm font-body-sm rounded text-primary hover:bg-surface-container transition-colors">Q1-Q4</button>
+                  <button class="px-3 py-1 bg-transparent text-body-sm font-body-sm rounded text-on-surface-variant hover:bg-surface-container-low transition-colors">Monthly</button>
+                </div>
+              </div>
+              <div class="w-full h-64 bg-surface-bright border border-outline-variant rounded flex items-end p-4 gap-2 relative">
+                <div class="absolute left-2 top-4 bottom-8 flex flex-col justify-between text-mono-data-sm font-mono-data-sm text-on-surface-variant">
+                  <span>$400k</span><span>$300k</span><span>$200k</span><span>$100k</span><span>0</span>
+                </div>
+                <div class="absolute left-12 right-4 top-6 border-b border-surface-variant w-[calc(100%-4rem)]"></div>
+                <div class="absolute left-12 right-4 top-[calc(25%+6px)] border-b border-surface-variant w-[calc(100%-4rem)]"></div>
+                <div class="absolute left-12 right-4 top-[calc(50%+6px)] border-b border-surface-variant w-[calc(100%-4rem)]"></div>
+                <div class="absolute left-12 right-4 top-[calc(75%+6px)] border-b border-surface-variant w-[calc(100%-4rem)]"></div>
+                <div class="flex-1 flex justify-around items-end ml-12 h-full pb-6 z-10">
+                  <div class="w-12 h-[85%] bg-data-blue rounded-t hover:opacity-80 transition-opacity cursor-pointer group relative">
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-secondary px-2 py-1 rounded text-mono-data-sm font-mono-data-sm opacity-0 group-hover:opacity-100 transition-opacity">$340k</div>
+                  </div>
+                  <div class="w-12 h-[60%] bg-secondary rounded-t hover:opacity-80 transition-opacity cursor-pointer group relative">
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-secondary px-2 py-1 rounded text-mono-data-sm font-mono-data-sm opacity-0 group-hover:opacity-100 transition-opacity">$240k</div>
+                  </div>
+                  <div class="w-12 h-[45%] bg-primary rounded-t hover:opacity-80 transition-opacity cursor-pointer group relative">
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-secondary px-2 py-1 rounded text-mono-data-sm font-mono-data-sm opacity-0 group-hover:opacity-100 transition-opacity">$180k</div>
+                  </div>
+                  <div class="w-12 h-[30%] bg-on-surface-variant rounded-t hover:opacity-80 transition-opacity cursor-pointer group relative">
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-secondary px-2 py-1 rounded text-mono-data-sm font-mono-data-sm opacity-0 group-hover:opacity-100 transition-opacity">$120k</div>
+                  </div>
+                  <div class="w-12 h-[70%] bg-data-blue rounded-t hover:opacity-80 transition-opacity cursor-pointer group relative">
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-secondary px-2 py-1 rounded text-mono-data-sm font-mono-data-sm opacity-0 group-hover:opacity-100 transition-opacity">$280k</div>
+                  </div>
+                </div>
+                <div class="absolute bottom-2 left-12 right-4 flex justify-around text-label-caps font-label-caps text-on-surface-variant">
+                  <span>Payroll</span><span>Ops</span><span>Marketing</span><span>R&amp;D</span><span>Legal</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-span-12 lg:col-span-5 bg-surface-container-lowest border border-outline-variant rounded-lg p-5 flex flex-col">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-title-sm font-title-sm text-primary">Tax Bracket Estimations</h3>
+                <button class="text-data-blue text-body-sm font-body-sm hover:underline">Detailed View</button>
+              </div>
+              <div class="flex-1 flex flex-col gap-2 overflow-y-auto">
+                <div class="grid grid-cols-4 px-3 py-2 border-b border-outline-variant text-label-caps font-label-caps text-on-surface-variant">
+                  <div class="col-span-2">Jurisdiction</div>
+                  <div class="text-right">Effective Rate</div>
+                  <div class="text-right">Est. Liability</div>
+                </div>
+                <div class="grid grid-cols-4 px-3 py-3 border-b border-surface-variant hover:bg-surface-container-low transition-colors items-center">
+                  <div class="col-span-2 text-body-sm font-body-sm font-medium text-primary">Federal (Corporate)</div>
+                  <div class="text-right text-mono-data font-mono-data text-on-surface-variant">21.00%</div>
+                  <div class="text-right text-mono-data font-mono-data text-primary">$660,548</div>
+                </div>
+                <div class="grid grid-cols-4 px-3 py-3 border-b border-surface-variant hover:bg-surface-container-low transition-colors items-center">
+                  <div class="col-span-2 text-body-sm font-body-sm font-medium text-primary">State (CA)</div>
+                  <div class="text-right text-mono-data font-mono-data text-on-surface-variant">8.84%</div>
+                  <div class="text-right text-mono-data font-mono-data text-primary">$278,054</div>
+                </div>
+                <div class="grid grid-cols-4 px-3 py-3 border-b border-surface-variant hover:bg-surface-container-low transition-colors items-center">
+                  <div class="col-span-2 text-body-sm font-body-sm font-medium text-primary">Local Municipal</div>
+                  <div class="text-right text-mono-data font-mono-data text-on-surface-variant">1.50%</div>
+                  <div class="text-right text-mono-data font-mono-data text-primary">$47,182</div>
+                </div>
+                <div class="grid grid-cols-4 px-3 py-3 hover:bg-surface-container-low transition-colors items-center mt-auto bg-surface-bright rounded">
+                  <div class="col-span-2 text-title-sm font-title-sm text-primary">Total Est. Tax</div>
+                  <div class="text-right text-mono-data font-mono-data text-on-surface-variant font-bold">31.34%</div>
+                  <div class="text-right text-mono-data font-mono-data text-primary font-bold">$985,784</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="vendor/xlsx.full.min.js"></script>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
