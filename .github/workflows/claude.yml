@@ -1,0 +1,29 @@
+name: Claude Code CI
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  claude-agent:
+    # Ensure the comment starts with @claude or your custom trigger phrase
+    if: startsWith(github.event.comment.body, '@claude')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Claude Code Action
+        uses: anthropics/claude-code-action@v1
+        with:
+          # If using an API key:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # OR if using an OAuth Token (uncomment below and comment out the API key line):
+          # claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
