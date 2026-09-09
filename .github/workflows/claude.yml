@@ -1,14 +1,12 @@
-name: Claude Code CI
+name: Claude Issue Resolver
 on:
-  issue_comment:
-    types: [created]
-  pull_request_review_comment:
-    types: [created]
+  issues:
+    types: [opened, assigned]
 
 jobs:
-  claude-agent:
-    # Ensure the comment starts with @claude or your custom trigger phrase
-    if: startsWith(github.event.comment.body, '@claude')
+  resolve-issue:
+    # Optional: Only run if the issue title or body contains @claude
+    if: contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -18,12 +16,26 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Run Claude Code Action
+      - name: Run Claude Code Automation
         uses: anthropics/claude-code-action@v1
         with:
-          # If using an API key:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          # OR if using an OAuth Token (uncomment below and comment out the API key line):
-          # claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Explicit prompt drives Claude to execute the Issue -> PR flow autonomously
+          prompt: |
+            You are running inside a GitHub Action responding to issue #${{ github.event.issue.number }}.
+            
+            1. Read the issue titled "${{ github.event.issue.title }}" and its description:
+               """
+               ${{ github.event.issue.body }}
+               """
+            2. Analyze the repository files and plan your implementation.
+            3. Create a new git branch named 'claude/issue-${{ github.event.issue.number }}'.
+            4. Implement the requested changes and write appropriate tests.
+            5. Commit your changes.
+            6. Use the `gh` CLI tool to create a Pull Request against the default branch. 
+               - The PR body MUST include 'Closes #${{ github.event.issue.number }}'.
+               - Set the PR assignee or reviewer to the issue creator: @${{ github.event.issue.user.login }}.
