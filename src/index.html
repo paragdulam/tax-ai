@@ -22,12 +22,6 @@
       <div class="flex-1 overflow-y-auto custom-scrollbar px-2">
         <ul class="space-y-1" id="nav-links">
           <li>
-            <a href="#" data-view="dashboard" class="nav-link flex items-center gap-3 px-4 py-2 transition-colors duration-150 rounded">
-              <span class="material-symbols-outlined text-[20px] nav-icon">dashboard</span>
-              <span class="text-body-sm font-body-sm">Dashboard</span>
-            </a>
-          </li>
-          <li>
             <a href="#" data-view="statements" class="nav-link flex items-center gap-3 px-4 py-2 transition-colors duration-150 rounded">
               <span class="material-symbols-outlined text-[20px] nav-icon">description</span>
               <span class="text-body-sm font-body-sm">Statements</span>
@@ -37,6 +31,12 @@
             <a href="#" data-view="review" class="nav-link flex items-center gap-3 px-4 py-2 transition-colors duration-150 rounded">
               <span class="material-symbols-outlined text-[20px] nav-icon">assignment_turned_in</span>
               <span class="text-body-sm font-body-sm">Review</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" data-view="groups" class="nav-link flex items-center gap-3 px-4 py-2 transition-colors duration-150 rounded">
+              <span class="material-symbols-outlined text-[20px] nav-icon">link</span>
+              <span class="text-body-sm font-body-sm">Groups</span>
             </a>
           </li>
           <li>
@@ -95,173 +95,13 @@
 
       <!-- Page Canvas -->
       <main class="flex-1 flex flex-col overflow-y-auto custom-scrollbar p-margin-desktop bg-surface-bright relative">
-        <!-- ================= DASHBOARD VIEW ================= -->
-        <section data-view="dashboard" class="view max-w-[1600px] mx-auto w-full">
-          <header class="mb-8 flex justify-between items-end">
-            <div>
-              <h2 class="text-headline-lg font-headline-lg text-primary">Overview</h2>
-              <p class="text-body-lg font-body-lg text-on-surface-variant mt-1">Q3 Fiscal Summary</p>
-            </div>
-            <div class="flex gap-3">
-              <button class="px-4 py-2 bg-surface-container-lowest border border-outline-variant text-on-surface rounded hover:bg-surface-container-low transition-colors flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">download</span>
-                <span class="text-label-caps font-label-caps">EXPORT</span>
-              </button>
-              <button class="px-4 py-2 bg-primary text-on-primary rounded hover:bg-inverse-surface transition-colors flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">add</span>
-                <span class="text-label-caps font-label-caps">NEW ENTRY</span>
-              </button>
-            </div>
-          </header>
-
-          <div class="grid grid-cols-12 gap-gutter">
-            <!-- Estimated Tax Liability -->
-            <div class="col-span-12 xl:col-span-8 bg-surface-container-lowest border border-outline-variant p-6 rounded-lg">
-              <div class="flex justify-between items-center mb-6 border-b border-outline-variant pb-4">
-                <h3 class="text-title-sm font-title-sm text-primary">Estimated Tax Liability</h3>
-                <span class="px-2 py-1 bg-surface-container-high rounded text-label-caps font-label-caps text-on-surface-variant flex items-center gap-1">
-                  Q3 2023 <span class="material-symbols-outlined text-[14px]">close</span>
-                </span>
-              </div>
-              <div class="flex flex-col md:flex-row gap-8">
-                <div class="md:w-1/3 flex flex-col justify-center">
-                  <p class="text-label-caps font-label-caps text-on-surface-variant mb-1 uppercase">Total Accrued</p>
-                  <p class="text-display-lg font-display-lg text-primary tracking-tight">$1.24M</p>
-                  <p class="text-body-sm font-body-sm text-success flex items-center gap-1 mt-2">
-                    <span class="material-symbols-outlined text-[16px]">arrow_downward</span>
-                    4.2% from last quarter
-                  </p>
-                </div>
-                <div class="md:w-2/3">
-                  <div class="flex justify-between text-label-caps font-label-caps text-on-surface-variant mb-2 border-b border-outline-variant pb-2">
-                    <span>CATEGORY</span>
-                    <span>AMOUNT</span>
-                  </div>
-                  <ul class="space-y-3 mt-4">
-                    <li class="flex justify-between items-center group cursor-default">
-                      <div class="flex items-center gap-3">
-                        <div class="w-3 h-3 rounded-sm bg-primary"></div>
-                        <span class="text-body-sm font-body-sm">Federal Income</span>
-                      </div>
-                      <span class="text-mono-data font-mono-data group-hover:text-primary transition-colors">$850,000</span>
-                    </li>
-                    <li class="flex justify-between items-center group cursor-default">
-                      <div class="flex items-center gap-3">
-                        <div class="w-3 h-3 rounded-sm bg-secondary"></div>
-                        <span class="text-body-sm font-body-sm">State &amp; Local</span>
-                      </div>
-                      <span class="text-mono-data font-mono-data group-hover:text-primary transition-colors">$240,000</span>
-                    </li>
-                    <li class="flex justify-between items-center group cursor-default">
-                      <div class="flex items-center gap-3">
-                        <div class="w-3 h-3 rounded-sm bg-surface-tint"></div>
-                        <span class="text-body-sm font-body-sm">Payroll Taxes</span>
-                      </div>
-                      <span class="text-mono-data font-mono-data group-hover:text-primary transition-colors">$150,000</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <!-- Review Progress -->
-            <div class="col-span-12 xl:col-span-4 bg-surface-container-lowest border border-outline-variant p-6 rounded-lg flex flex-col">
-              <div class="flex justify-between items-center mb-6 border-b border-outline-variant pb-4">
-                <h3 class="text-title-sm font-title-sm text-primary">Review Progress</h3>
-                <button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
-              </div>
-              <div class="flex-1 flex flex-col items-center justify-center py-4">
-                <div class="relative w-32 h-32 flex items-center justify-center">
-                  <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    <circle class="text-surface-container-highest" cx="50" cy="50" fill="none" r="45" stroke="currentColor" stroke-width="8"></circle>
-                    <circle class="text-primary" cx="50" cy="50" fill="none" r="45" stroke="currentColor" stroke-dasharray="282.7" stroke-dashoffset="70.67" stroke-linecap="round" stroke-width="8"></circle>
-                  </svg>
-                  <div class="absolute inset-0 flex flex-col items-center justify-center">
-                    <span class="text-headline-lg font-headline-lg text-primary">75%</span>
-                  </div>
-                </div>
-                <p class="text-body-sm font-body-sm text-on-surface-variant mt-6 text-center">3 of 4 schedules approved.<br />Awaiting Final Sign-off.</p>
-              </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="col-span-12 xl:col-span-4 bg-surface-container-lowest border border-outline-variant p-6 rounded-lg">
-              <h3 class="text-title-sm font-title-sm text-primary mb-4 border-b border-outline-variant pb-4">Quick Actions</h3>
-              <div class="grid grid-cols-2 gap-4">
-                <button class="flex flex-col items-center justify-center p-4 bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-outline-variant rounded transition-all duration-200">
-                  <span class="material-symbols-outlined text-[24px] text-primary mb-2">upload_file</span>
-                  <span class="text-label-caps font-label-caps">Upload</span>
-                </button>
-                <button class="flex flex-col items-center justify-center p-4 bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-outline-variant rounded transition-all duration-200">
-                  <span class="material-symbols-outlined text-[24px] text-primary mb-2">fact_check</span>
-                  <span class="text-label-caps font-label-caps">Review</span>
-                </button>
-                <button class="flex flex-col items-center justify-center p-4 bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-outline-variant rounded transition-all duration-200">
-                  <span class="material-symbols-outlined text-[24px] text-primary mb-2">summarize</span>
-                  <span class="text-label-caps font-label-caps">Report</span>
-                </button>
-                <button class="flex flex-col items-center justify-center p-4 bg-surface-container-low hover:bg-surface-container border border-transparent hover:border-outline-variant rounded transition-all duration-200">
-                  <span class="material-symbols-outlined text-[24px] text-primary mb-2">chat_bubble</span>
-                  <span class="text-label-caps font-label-caps">Ask AI</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Recent Transactions -->
-            <div class="col-span-12 xl:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex flex-col">
-              <div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest z-10 sticky top-0">
-                <h3 class="text-title-sm font-title-sm text-primary">Recent Transactions</h3>
-                <button class="text-label-caps font-label-caps text-primary hover:underline">VIEW ALL</button>
-              </div>
-              <div class="flex-1 overflow-auto">
-                <table class="w-full text-left border-collapse">
-                  <thead class="bg-surface-bright border-b border-outline-variant sticky top-0">
-                    <tr>
-                      <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant font-medium">DATE</th>
-                      <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant font-medium">DESCRIPTION</th>
-                      <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant font-medium">STATUS</th>
-                      <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant font-medium text-right">AMOUNT</th>
-                    </tr>
-                  </thead>
-                  <tbody class="text-body-sm font-body-sm">
-                    <tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
-                      <td class="p-table-cell-padding text-mono-data font-mono-data text-on-surface-variant">2023-10-24</td>
-                      <td class="p-table-cell-padding">Q3 Estimated Payment</td>
-                      <td class="p-table-cell-padding"><span class="px-2 py-0.5 bg-secondary-container text-on-secondary-fixed text-label-caps font-label-caps rounded-sm">PROCESSING</span></td>
-                      <td class="p-table-cell-padding text-right text-mono-data font-mono-data">$125,000.00</td>
-                    </tr>
-                    <tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
-                      <td class="p-table-cell-padding text-mono-data font-mono-data text-on-surface-variant">2023-10-18</td>
-                      <td class="p-table-cell-padding">State Withholding Adjustment</td>
-                      <td class="p-table-cell-padding"><span class="px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-label-caps font-label-caps rounded-sm">COMPLETED</span></td>
-                      <td class="p-table-cell-padding text-right text-mono-data font-mono-data">$42,300.50</td>
-                    </tr>
-                    <tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
-                      <td class="p-table-cell-padding text-mono-data font-mono-data text-on-surface-variant">2023-10-12</td>
-                      <td class="p-table-cell-padding">Corporate Tax Filing Fee</td>
-                      <td class="p-table-cell-padding"><span class="px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed text-label-caps font-label-caps rounded-sm">COMPLETED</span></td>
-                      <td class="p-table-cell-padding text-right text-mono-data font-mono-data">$850.00</td>
-                    </tr>
-                    <tr class="hover:bg-surface-container-low transition-colors">
-                      <td class="p-table-cell-padding text-mono-data font-mono-data text-on-surface-variant">2023-10-05</td>
-                      <td class="p-table-cell-padding">Depreciation Schedule Review</td>
-                      <td class="p-table-cell-padding"><span class="px-2 py-0.5 bg-error-container text-on-error-container text-label-caps font-label-caps rounded-sm">FLAGGED</span></td>
-                      <td class="p-table-cell-padding text-right text-mono-data font-mono-data">-</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <!-- ================= STATEMENTS VIEW ================= -->
         <section data-view="statements" class="view max-w-[1600px] mx-auto w-full hidden">
           <div class="flex flex-col gap-6">
             <div class="flex items-center justify-between">
               <div>
                 <h2 class="text-headline-lg font-headline-lg text-on-surface mb-1">Statement Manager</h2>
-                <p class="text-body-sm font-body-sm text-on-surface-variant">Manage and process raw financial documents for FY-2023.</p>
+                <p class="text-body-sm font-body-sm text-on-surface-variant">Manage and process raw financial documents, grouped by financial year.</p>
               </div>
               <div class="flex items-center gap-3">
                 <button id="delete-selected-btn" class="h-8 px-4 hidden items-center gap-2 border border-error text-error rounded bg-surface-container-lowest hover:bg-error-container transition-colors font-body-sm">
@@ -303,6 +143,7 @@
                           <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant uppercase text-right">Upload Date</th>
                           <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant uppercase text-right">Size</th>
                           <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant uppercase">Status</th>
+                          <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant uppercase">Account Type</th>
                         </tr>
                       </thead>
                       <tbody id="statement-table-body" class="text-body-sm font-body-sm divide-y divide-outline-variant"></tbody>
@@ -337,22 +178,73 @@
               <p class="text-body-sm font-body-sm text-on-surface-variant">Categorize and verify recent ledger entries.</p>
             </div>
             <div class="flex gap-2">
-              <button class="flex items-center gap-2 px-4 py-2 border border-outline-variant rounded text-body-sm font-body-sm font-semibold hover:bg-surface-container-low transition-colors">
-                <span class="material-symbols-outlined text-[18px]">download</span>
-                Export
-              </button>
-              <button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded text-body-sm font-body-sm font-semibold hover:bg-surface-tint transition-colors">
-                <span class="material-symbols-outlined text-[18px]">check_circle</span>
-                Mark All Reviewed
+              <div class="relative">
+                <button id="review-export-btn" type="button" class="flex items-center gap-2 px-4 py-2 border border-outline-variant rounded text-body-sm font-body-sm font-semibold hover:bg-surface-container-low transition-colors">
+                  <span class="material-symbols-outlined text-[18px]">download</span>
+                  Export
+                </button>
+                <div id="review-export-menu" class="hidden absolute right-0 mt-1 w-52 bg-surface-container-lowest border border-outline-variant rounded shadow-xl z-20 py-1">
+                  <button type="button" data-export-format="csv" class="w-full text-left px-4 py-2 text-body-sm font-body-sm hover:bg-surface-container-low transition-colors">Export as CSV</button>
+                  <button type="button" data-export-format="xlsx" class="w-full text-left px-4 py-2 text-body-sm font-body-sm hover:bg-surface-container-low transition-colors">Export as Excel (.xlsx)</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="review-selection-toolbar" class="hidden mb-4 flex items-center justify-between gap-3 px-4 py-2 rounded bg-primary-container text-on-primary-container">
+            <span id="review-selection-count" class="text-body-sm font-body-sm font-semibold">0 selected</span>
+            <div class="flex items-center gap-2">
+              <select id="review-bulk-category-select" class="px-2 py-1.5 rounded text-body-sm font-body-sm bg-surface-container-lowest border border-outline-variant text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+                <option value="__placeholder__" selected>Set classification...</option>
+                <option value="">Uncategorized</option>
+                <option value="Income">Income</option>
+                <option value="Personal Expense">Personal Expense</option>
+                <option value="Business Expense">Business Expense</option>
+                <option value="Internal Transfer">Internal Transfer</option>
+              </select>
+              <button id="review-clear-selection-btn" type="button" class="px-3 py-1.5 rounded text-body-sm font-body-sm hover:bg-black/5 transition-colors">Clear</button>
+              <button id="review-add-to-group-btn" type="button" class="px-3 py-1.5 bg-primary text-on-primary rounded text-body-sm font-body-sm font-semibold hover:bg-surface-tint transition-colors">Add to Group</button>
+            </div>
+          </div>
+
+          <div id="group-suggestions-banner" class="hidden mb-4 flex items-center justify-between gap-3 px-4 py-2 rounded border border-outline-variant bg-surface-container-low">
+            <span id="group-suggestions-count" class="text-body-sm font-body-sm"></span>
+            <div class="flex items-center gap-2">
+              <button id="group-suggestions-review-btn" type="button" class="px-3 py-1.5 bg-primary text-on-primary rounded text-body-sm font-body-sm font-semibold hover:bg-surface-tint transition-colors">Review</button>
+              <button id="group-suggestions-banner-dismiss" type="button" class="w-8 h-8 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container transition-colors" title="Dismiss">
+                <span class="material-symbols-outlined text-[18px]">close</span>
               </button>
             </div>
           </div>
 
-          <div class="mb-6 flex gap-2">
-            <button class="px-3 py-1.5 bg-surface-container-high text-on-surface rounded text-body-sm font-body-sm font-semibold border border-transparent">All Transactions</button>
-            <button class="px-3 py-1.5 bg-surface-container-lowest text-on-surface-variant border border-outline-variant rounded text-body-sm font-body-sm hover:bg-surface-container-low transition-colors">Uncategorized (12)</button>
-            <button class="px-3 py-1.5 bg-surface-container-lowest text-on-surface-variant border border-outline-variant rounded text-body-sm font-body-sm hover:bg-surface-container-low transition-colors">Business</button>
-            <button class="px-3 py-1.5 bg-surface-container-lowest text-on-surface-variant border border-outline-variant rounded text-body-sm font-body-sm hover:bg-surface-container-low transition-colors">Personal</button>
+          <div class="mb-6 flex items-center justify-between flex-wrap gap-3">
+            <div id="review-filter-bar" class="flex gap-2 flex-wrap">
+              <button type="button" class="review-filter-btn px-3 py-1.5 rounded text-body-sm font-body-sm transition-colors" data-filter="">All Transactions</button>
+              <button type="button" class="review-filter-btn px-3 py-1.5 rounded text-body-sm font-body-sm transition-colors" data-filter="Uncategorized">Uncategorized</button>
+              <button type="button" class="review-filter-btn px-3 py-1.5 rounded text-body-sm font-body-sm transition-colors" data-filter="Income">Income</button>
+              <button type="button" class="review-filter-btn px-3 py-1.5 rounded text-body-sm font-body-sm transition-colors" data-filter="Personal Expense">Personal Expense</button>
+              <button type="button" class="review-filter-btn px-3 py-1.5 rounded text-body-sm font-body-sm transition-colors" data-filter="Business Expense">Business Expense</button>
+              <button type="button" class="review-filter-btn px-3 py-1.5 rounded text-body-sm font-body-sm transition-colors" data-filter="Internal Transfer">Internal Transfer</button>
+            </div>
+            <div class="flex items-center gap-2">
+              <label for="review-file-filter" class="text-body-sm font-body-sm text-on-surface-variant">File</label>
+              <select id="review-file-filter" class="px-2 py-1.5 rounded text-body-sm font-body-sm bg-surface-container-lowest border border-outline-variant text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-shadow max-w-[220px]">
+                <option value="">All Files</option>
+              </select>
+              <label for="review-group-filter" class="text-body-sm font-body-sm text-on-surface-variant">Group</label>
+              <select id="review-group-filter" class="px-2 py-1.5 rounded text-body-sm font-body-sm bg-surface-container-lowest border border-outline-variant text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-shadow max-w-[220px]">
+                <option value="">All Groups</option>
+                <option value="__grouped__">Grouped Only</option>
+                <option value="__ungrouped__">Ungrouped Only</option>
+              </select>
+              <label for="review-date-from" class="text-body-sm font-body-sm text-on-surface-variant">From</label>
+              <input id="review-date-from" type="date" class="px-2 py-1.5 rounded text-body-sm font-body-sm bg-surface-container-lowest border border-outline-variant text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-shadow" />
+              <label for="review-date-to" class="text-body-sm font-body-sm text-on-surface-variant">To</label>
+              <input id="review-date-to" type="date" class="px-2 py-1.5 rounded text-body-sm font-body-sm bg-surface-container-lowest border border-outline-variant text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-shadow" />
+              <button id="review-date-clear" type="button" class="w-8 h-8 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" title="Clear date range">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+              </button>
+            </div>
           </div>
 
           <div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
@@ -365,10 +257,9 @@
               <table class="w-full text-left border-collapse">
                 <thead class="bg-surface-container-low border-b border-outline-variant sticky top-0">
                   <tr>
-                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant w-12"><input class="rounded-sm border-outline-variant text-primary focus:ring-primary" type="checkbox" /></th>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant w-12"><input id="review-select-all-checkbox" class="rounded-sm border-outline-variant text-primary focus:ring-primary" type="checkbox" /></th>
                     <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant">Date</th>
                     <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant">Merchant / Description</th>
-                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant">Suggested Category</th>
                     <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant text-right">Amount</th>
                     <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant text-center">Classification</th>
                     <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant w-12"></th>
@@ -391,147 +282,214 @@
           </div>
         </section>
 
+        <!-- ================= GROUPS VIEW ================= -->
+        <section data-view="groups" class="view max-w-[1600px] mx-auto w-full hidden flex-1 flex flex-col min-h-0">
+          <div class="mb-8">
+            <h2 class="text-headline-lg font-headline-lg text-on-surface mb-1">Transaction Groups</h2>
+            <p class="text-body-sm font-body-sm text-on-surface-variant">Related purchases, EMIs and loan series, linked together.</p>
+          </div>
+
+          <div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden flex-1 flex flex-col min-h-0">
+            <div id="groups-empty-state" class="hidden flex-1 flex flex-col items-center justify-center gap-2 py-16 px-4 text-center">
+              <span class="material-symbols-outlined text-[32px] text-on-surface-variant">link</span>
+              <p class="text-body-sm font-body-sm font-medium">No groups yet</p>
+              <p class="text-label-caps font-label-caps text-on-surface-variant">Select transactions on Review and click "Add to Group" to create one</p>
+            </div>
+            <div id="groups-table-wrap" class="overflow-auto flex-1">
+              <table class="w-full text-left border-collapse">
+                <thead class="bg-surface-container-low border-b border-outline-variant sticky top-0">
+                  <tr>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant">Type</th>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant">Label</th>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant text-center">Transactions</th>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant text-right">Total (Considered)</th>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant text-right">Total (Excluded)</th>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant">Created</th>
+                    <th class="p-table-cell-padding text-label-caps font-label-caps text-on-surface-variant w-12"></th>
+                  </tr>
+                </thead>
+                <tbody id="groups-table-body" class="text-body-sm font-body-sm divide-y divide-outline-variant"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
         <!-- ================= INSIGHTS VIEW ================= -->
         <section data-view="insights" class="view max-w-[1600px] mx-auto w-full hidden">
           <div class="flex justify-between items-end mb-2">
             <div>
               <h2 class="text-headline-lg font-headline-lg text-primary">Deep Dive Analytics</h2>
-              <p class="text-body-sm font-body-sm text-on-surface-variant mt-1">FY 2023 Tax Liability Estimation &amp; Review</p>
+              <p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Income &amp; Expense Summary</p>
             </div>
-            <div class="flex gap-3">
-              <button class="flex items-center gap-2 px-4 py-2 border border-outline-variant bg-transparent text-primary text-body-sm font-body-sm rounded hover:bg-surface-container-low transition-colors">
-                <span class="material-symbols-outlined text-[18px]">download</span>
-                Export Report
-              </button>
-              <button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary text-body-sm font-body-sm rounded hover:bg-inverse-surface transition-colors">
-                <span class="material-symbols-outlined text-[18px]">tune</span>
-                Adjust Parameters
+            <div class="flex items-center gap-2">
+              <label for="insights-profile-select" class="text-body-sm font-body-sm text-on-surface-variant">Tax Profile</label>
+              <select id="insights-profile-select" class="px-3 py-2 rounded text-body-sm font-body-sm bg-surface-container-lowest border border-outline-variant text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-shadow">
+                <option value="Salaried">Salaried</option>
+                <option value="Self Employed">Self Employed</option>
+                <option value="Business">Business</option>
+              </select>
+              <button id="insights-tax-info-btn" type="button" class="text-on-surface-variant hover:text-primary transition-colors" title="View tax slab information" aria-label="View tax slab information">
+                <span class="material-symbols-outlined text-[20px]">info</span>
               </button>
             </div>
           </div>
 
           <div class="grid grid-cols-12 gap-4 mt-6">
-            <div class="col-span-12 md:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-lg p-5 flex flex-col justify-between">
+            <div class="col-span-12 md:col-span-6 bg-surface-container-lowest border border-outline-variant rounded-lg p-5 flex flex-col justify-between">
               <div class="flex justify-between items-start mb-4">
                 <h3 class="text-label-caps font-label-caps text-on-surface-variant uppercase">Total Gross Income</h3>
                 <span class="material-symbols-outlined text-success">trending_up</span>
               </div>
               <div>
-                <div class="text-display-lg font-display-lg text-primary font-mono-data tracking-tight">$4,250,890</div>
-                <div class="flex items-center gap-2 mt-2">
-                  <span class="px-2 py-0.5 bg-surface-container-high rounded text-mono-data-sm font-mono-data-sm text-success">+12.4% YoY</span>
-                  <span class="text-body-sm font-body-sm text-on-surface-variant">vs $3.78M (FY22)</span>
-                </div>
+                <div id="insights-gross-income" class="text-display-lg font-display-lg text-primary font-mono-data tracking-tight">&#8377;0.00</div>
               </div>
             </div>
-            <div class="col-span-12 md:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-lg p-5 flex flex-col justify-between">
+            <div class="col-span-12 md:col-span-6 bg-surface-container-lowest border border-outline-variant rounded-lg p-5 flex flex-col justify-between">
               <div class="flex justify-between items-start mb-4">
                 <h3 class="text-label-caps font-label-caps text-on-surface-variant uppercase">Deductible Expenses</h3>
                 <span class="material-symbols-outlined text-warning">receipt_long</span>
               </div>
               <div>
-                <div class="text-display-lg font-display-lg text-primary font-mono-data tracking-tight">$1,105,420</div>
+                <div id="insights-deductible-expenses" class="text-display-lg font-display-lg text-primary font-mono-data tracking-tight">&#8377;0.00</div>
                 <div class="flex items-center gap-2 mt-2">
-                  <span class="px-2 py-0.5 bg-surface-container-high rounded text-mono-data-sm font-mono-data-sm text-warning">+4.2% YoY</span>
-                  <span class="text-body-sm font-body-sm text-on-surface-variant">26% of Gross Income</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-span-12 md:col-span-4 bg-primary border border-primary rounded-lg p-5 flex flex-col justify-between relative overflow-hidden">
-              <div class="absolute top-0 right-0 w-32 h-32 bg-data-blue opacity-20 blur-[50px] rounded-full translate-x-1/2 -translate-y-1/2"></div>
-              <div class="flex justify-between items-start mb-4 relative z-10">
-                <h3 class="text-label-caps font-label-caps text-on-primary-fixed-variant uppercase">TaxShield AI Confidence</h3>
-                <span class="material-symbols-outlined text-on-primary">model_training</span>
-              </div>
-              <div class="relative z-10">
-                <div class="flex items-baseline gap-2">
-                  <div class="text-display-lg font-display-lg text-on-primary font-mono-data tracking-tight">98.7</div>
-                  <div class="text-title-lg font-title-lg text-on-primary-fixed-variant">%</div>
-                </div>
-                <div class="flex items-center gap-2 mt-2">
-                  <span class="w-2 h-2 rounded-full bg-success"></span>
-                  <span class="text-body-sm font-body-sm text-on-primary-fixed-variant">Based on 14,205 processed documents</span>
+                  <span id="insights-expense-ratio" class="text-body-sm font-body-sm text-on-surface-variant">0% of Gross Income</span>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="grid grid-cols-12 gap-4 mt-4">
-            <div class="col-span-12 lg:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-lg p-5">
-              <div class="flex justify-between items-center mb-6">
-                <h3 class="text-title-sm font-title-sm text-primary">Expense Categorization</h3>
-                <div class="flex gap-2">
-                  <button class="px-3 py-1 bg-surface-container-low text-body-sm font-body-sm rounded text-primary hover:bg-surface-container transition-colors">Q1-Q4</button>
-                  <button class="px-3 py-1 bg-transparent text-body-sm font-body-sm rounded text-on-surface-variant hover:bg-surface-container-low transition-colors">Monthly</button>
-                </div>
-              </div>
-              <div class="w-full h-64 bg-surface-bright border border-outline-variant rounded flex items-end p-4 gap-2 relative">
-                <div class="absolute left-2 top-4 bottom-8 flex flex-col justify-between text-mono-data-sm font-mono-data-sm text-on-surface-variant">
-                  <span>$400k</span><span>$300k</span><span>$200k</span><span>$100k</span><span>0</span>
-                </div>
-                <div class="absolute left-12 right-4 top-6 border-b border-surface-variant w-[calc(100%-4rem)]"></div>
-                <div class="absolute left-12 right-4 top-[calc(25%+6px)] border-b border-surface-variant w-[calc(100%-4rem)]"></div>
-                <div class="absolute left-12 right-4 top-[calc(50%+6px)] border-b border-surface-variant w-[calc(100%-4rem)]"></div>
-                <div class="absolute left-12 right-4 top-[calc(75%+6px)] border-b border-surface-variant w-[calc(100%-4rem)]"></div>
-                <div class="flex-1 flex justify-around items-end ml-12 h-full pb-6 z-10">
-                  <div class="w-12 h-[85%] bg-data-blue rounded-t hover:opacity-80 transition-opacity cursor-pointer group relative">
-                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-secondary px-2 py-1 rounded text-mono-data-sm font-mono-data-sm opacity-0 group-hover:opacity-100 transition-opacity">$340k</div>
-                  </div>
-                  <div class="w-12 h-[60%] bg-secondary rounded-t hover:opacity-80 transition-opacity cursor-pointer group relative">
-                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-secondary px-2 py-1 rounded text-mono-data-sm font-mono-data-sm opacity-0 group-hover:opacity-100 transition-opacity">$240k</div>
-                  </div>
-                  <div class="w-12 h-[45%] bg-primary rounded-t hover:opacity-80 transition-opacity cursor-pointer group relative">
-                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-secondary px-2 py-1 rounded text-mono-data-sm font-mono-data-sm opacity-0 group-hover:opacity-100 transition-opacity">$180k</div>
-                  </div>
-                  <div class="w-12 h-[30%] bg-on-surface-variant rounded-t hover:opacity-80 transition-opacity cursor-pointer group relative">
-                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-secondary px-2 py-1 rounded text-mono-data-sm font-mono-data-sm opacity-0 group-hover:opacity-100 transition-opacity">$120k</div>
-                  </div>
-                  <div class="w-12 h-[70%] bg-data-blue rounded-t hover:opacity-80 transition-opacity cursor-pointer group relative">
-                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-secondary px-2 py-1 rounded text-mono-data-sm font-mono-data-sm opacity-0 group-hover:opacity-100 transition-opacity">$280k</div>
-                  </div>
-                </div>
-                <div class="absolute bottom-2 left-12 right-4 flex justify-around text-label-caps font-label-caps text-on-surface-variant">
-                  <span>Payroll</span><span>Ops</span><span>Marketing</span><span>R&amp;D</span><span>Legal</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-span-12 lg:col-span-5 bg-surface-container-lowest border border-outline-variant rounded-lg p-5 flex flex-col">
+            <div class="col-span-12 bg-surface-container-lowest border border-outline-variant rounded-lg p-5">
               <div class="flex justify-between items-center mb-4">
-                <h3 class="text-title-sm font-title-sm text-primary">Tax Bracket Estimations</h3>
-                <button class="text-data-blue text-body-sm font-body-sm hover:underline">Detailed View</button>
+                <h3 class="text-title-sm font-title-sm text-primary">Estimated Tax Liability</h3>
+                <span id="insights-tax-profile-label" class="text-label-caps font-label-caps text-on-surface-variant uppercase"></span>
               </div>
-              <div class="flex-1 flex flex-col gap-2 overflow-y-auto">
-                <div class="grid grid-cols-4 px-3 py-2 border-b border-outline-variant text-label-caps font-label-caps text-on-surface-variant">
-                  <div class="col-span-2">Jurisdiction</div>
-                  <div class="text-right">Effective Rate</div>
-                  <div class="text-right">Est. Liability</div>
-                </div>
-                <div class="grid grid-cols-4 px-3 py-3 border-b border-surface-variant hover:bg-surface-container-low transition-colors items-center">
-                  <div class="col-span-2 text-body-sm font-body-sm font-medium text-primary">Federal (Corporate)</div>
-                  <div class="text-right text-mono-data font-mono-data text-on-surface-variant">21.00%</div>
-                  <div class="text-right text-mono-data font-mono-data text-primary">$660,548</div>
-                </div>
-                <div class="grid grid-cols-4 px-3 py-3 border-b border-surface-variant hover:bg-surface-container-low transition-colors items-center">
-                  <div class="col-span-2 text-body-sm font-body-sm font-medium text-primary">State (CA)</div>
-                  <div class="text-right text-mono-data font-mono-data text-on-surface-variant">8.84%</div>
-                  <div class="text-right text-mono-data font-mono-data text-primary">$278,054</div>
-                </div>
-                <div class="grid grid-cols-4 px-3 py-3 border-b border-surface-variant hover:bg-surface-container-low transition-colors items-center">
-                  <div class="col-span-2 text-body-sm font-body-sm font-medium text-primary">Local Municipal</div>
-                  <div class="text-right text-mono-data font-mono-data text-on-surface-variant">1.50%</div>
-                  <div class="text-right text-mono-data font-mono-data text-primary">$47,182</div>
-                </div>
-                <div class="grid grid-cols-4 px-3 py-3 hover:bg-surface-container-low transition-colors items-center mt-auto bg-surface-bright rounded">
-                  <div class="col-span-2 text-title-sm font-title-sm text-primary">Total Est. Tax</div>
-                  <div class="text-right text-mono-data font-mono-data text-on-surface-variant font-bold">31.34%</div>
-                  <div class="text-right text-mono-data font-mono-data text-primary font-bold">$985,784</div>
-                </div>
+              <div id="insights-tax-regimes" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+              <p class="text-label-caps font-label-caps text-on-surface-variant mt-4">
+                Estimate only: FY 2026-27 slab rates, standard deduction (salaried only), and Section 87A rebate. Does not account for surcharge, marginal relief, or deductions such as 80C/80D/HRA.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 gap-4 mt-4 mb-6">
+            <div class="col-span-12 bg-surface-container-lowest border border-outline-variant rounded-lg p-5">
+              <div class="flex justify-between items-center mb-6">
+                <h3 class="text-title-sm font-title-sm text-primary">Category Breakdown</h3>
+              </div>
+              <div id="insights-category-chart" class="w-full h-64 bg-surface-bright border border-outline-variant rounded">
+                <div class="w-full h-full flex items-center justify-center text-body-sm font-body-sm text-on-surface-variant">No transactions yet</div>
               </div>
             </div>
           </div>
         </section>
       </main>
+    </div>
+
+    <div id="statement-viewer-overlay" class="hidden fixed inset-0 bg-inverse-surface/70 z-50 flex items-center justify-center p-6">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-xl w-full max-w-4xl max-h-[85vh] flex flex-col">
+        <div class="flex items-center justify-between p-4 border-b border-outline-variant shrink-0">
+          <h3 id="statement-viewer-title" class="text-title-sm font-title-sm text-on-surface truncate pr-4"></h3>
+          <button id="statement-viewer-close" type="button" class="text-on-surface-variant hover:text-on-surface shrink-0">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div id="statement-viewer-body" class="flex-1 overflow-auto p-4 flex items-center justify-center text-body-sm font-body-sm text-on-surface-variant"></div>
+      </div>
+    </div>
+
+    <div id="similar-transactions-overlay" class="hidden fixed inset-0 bg-inverse-surface/70 z-50 flex items-center justify-center p-6">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col">
+        <div class="p-4 border-b border-outline-variant shrink-0">
+          <h3 class="text-title-sm font-title-sm text-on-surface">Mark similar transactions?</h3>
+          <p id="similar-transactions-subtitle" class="text-body-sm font-body-sm text-on-surface-variant mt-1"></p>
+        </div>
+        <div id="similar-transactions-body" class="flex-1 overflow-auto p-4 flex flex-col gap-1"></div>
+        <div class="flex items-center justify-end gap-2 p-4 border-t border-outline-variant shrink-0">
+          <button id="similar-transactions-close" type="button" class="px-4 py-2 border border-outline-variant rounded text-body-sm font-body-sm font-semibold hover:bg-surface-container-low transition-colors">Close</button>
+          <button id="similar-transactions-mark-selected" type="button" class="px-4 py-2 border border-outline-variant rounded text-body-sm font-body-sm font-semibold hover:bg-surface-container-low transition-colors">Mark Selected</button>
+          <button id="similar-transactions-mark-all" type="button" class="px-4 py-2 bg-primary text-on-primary rounded text-body-sm font-body-sm font-semibold hover:bg-surface-tint transition-colors">Mark All</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="group-editor-overlay" class="hidden fixed inset-0 bg-inverse-surface/70 z-50 flex items-center justify-center p-6">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-xl w-full max-w-md max-h-[85vh] flex flex-col">
+        <div class="p-4 border-b border-outline-variant shrink-0">
+          <h3 class="text-title-sm font-title-sm text-on-surface">Add to Group</h3>
+        </div>
+        <div class="flex-1 overflow-auto p-4 flex flex-col gap-4">
+          <label class="flex items-center gap-2 text-body-sm font-body-sm">
+            <input id="group-editor-mode-new" type="radio" name="group-editor-mode" class="text-primary focus:ring-primary" checked />
+            Create new group
+          </label>
+          <div class="pl-6 flex flex-col gap-2">
+            <label for="group-editor-type-select" class="text-label-caps font-label-caps text-on-surface-variant">Group Type</label>
+            <select id="group-editor-type-select" class="px-2 py-1.5 rounded text-body-sm font-body-sm bg-surface-container-lowest border border-outline-variant text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"></select>
+            <label for="group-editor-label-input" class="text-label-caps font-label-caps text-on-surface-variant mt-2">Label</label>
+            <input id="group-editor-label-input" type="text" placeholder='e.g. "Car Loan - Honda City"' class="px-2 py-1.5 rounded text-body-sm font-body-sm bg-surface-container-lowest border border-outline-variant text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary" />
+          </div>
+          <label class="flex items-center gap-2 text-body-sm font-body-sm">
+            <input id="group-editor-mode-existing" type="radio" name="group-editor-mode" class="text-primary focus:ring-primary" />
+            Add to existing group
+          </label>
+          <div class="pl-6">
+            <select id="group-editor-existing-select" class="w-full px-2 py-1.5 rounded text-body-sm font-body-sm bg-surface-container-lowest border border-outline-variant text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"></select>
+          </div>
+        </div>
+        <div class="flex items-center justify-end gap-2 p-4 border-t border-outline-variant shrink-0">
+          <button id="group-editor-cancel" type="button" class="px-4 py-2 border border-outline-variant rounded text-body-sm font-body-sm font-semibold hover:bg-surface-container-low transition-colors">Cancel</button>
+          <button id="group-editor-save" type="button" class="px-4 py-2 bg-primary text-on-primary rounded text-body-sm font-body-sm font-semibold hover:bg-surface-tint transition-colors">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="group-suggestions-overlay" class="hidden fixed inset-0 bg-inverse-surface/70 z-50 flex items-center justify-center p-6">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col">
+        <div class="p-4 border-b border-outline-variant shrink-0">
+          <h3 class="text-title-sm font-title-sm text-on-surface">Possible recurring EMI/loan series</h3>
+          <p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Group these together, or mark them as not a group.</p>
+        </div>
+        <div id="group-suggestions-body" class="flex-1 overflow-auto p-4 flex flex-col gap-2"></div>
+        <div class="flex items-center justify-end gap-2 p-4 border-t border-outline-variant shrink-0">
+          <button id="group-suggestions-close" type="button" class="px-4 py-2 border border-outline-variant rounded text-body-sm font-body-sm font-semibold hover:bg-surface-container-low transition-colors">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="group-detail-overlay" class="hidden fixed inset-0 bg-inverse-surface/70 z-50 flex items-center justify-center p-6">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col">
+        <div class="p-4 border-b border-outline-variant shrink-0 flex items-end gap-3">
+          <div class="flex-1">
+            <label for="group-detail-type-select" class="text-label-caps font-label-caps text-on-surface-variant">Group Type</label>
+            <select id="group-detail-type-select" class="w-full px-2 py-1.5 rounded text-body-sm font-body-sm bg-surface-container-lowest border border-outline-variant text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"></select>
+          </div>
+          <div class="flex-1">
+            <label for="group-detail-label-input" class="text-label-caps font-label-caps text-on-surface-variant">Label</label>
+            <input id="group-detail-label-input" type="text" class="w-full px-2 py-1.5 rounded text-body-sm font-body-sm bg-surface-container-lowest border border-outline-variant text-on-surface focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary" />
+          </div>
+          <button id="group-detail-save" type="button" class="px-4 py-2 bg-primary text-on-primary rounded text-body-sm font-body-sm font-semibold hover:bg-surface-tint transition-colors shrink-0">Save</button>
+          <button id="group-detail-close" type="button" class="text-on-surface-variant hover:text-on-surface shrink-0">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div id="group-detail-body" class="flex-1 overflow-auto p-4 flex flex-col gap-1"></div>
+      </div>
+    </div>
+
+    <div id="tax-slabs-info-overlay" class="hidden fixed inset-0 bg-inverse-surface/70 z-50 flex items-center justify-center p-6">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col">
+        <div class="flex items-center justify-between p-4 border-b border-outline-variant shrink-0">
+          <div>
+            <h3 class="text-title-sm font-title-sm text-on-surface">Income Tax Slabs (FY 2026-27, India)</h3>
+            <p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Old vs New regime, by tax profile</p>
+          </div>
+          <button id="tax-slabs-info-close" type="button" class="text-on-surface-variant hover:text-on-surface shrink-0">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div id="tax-slabs-info-tabs" class="flex gap-1 px-4 pt-3 border-b border-outline-variant shrink-0"></div>
+        <div id="tax-slabs-info-body" class="flex-1 overflow-auto p-4 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </div>
     </div>
 
     <script src="vendor/xlsx.full.min.js"></script>
