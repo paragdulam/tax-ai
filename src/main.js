@@ -1,4 +1,5 @@
 import * as pdfjsLib from "./vendor/pdfjs/pdf.mjs";
+import { decryptExcelBuffer, IncorrectPasswordError } from "./statement-crypto.js";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL("./vendor/pdfjs/pdf.worker.min.mjs", import.meta.url).href;
 
@@ -261,9 +262,13 @@ async function renderStatementPreview(body, statement) {
   body.innerHTML = "";
   body.classList.remove("flex", "items-center", "justify-center");
 
+  // Password-protected files are decrypted automatically using the stored password - no prompt
+  // is shown here; if none is stored yet, the user is pointed at the row's "Unlock" action.
+  const password = ext === "pdf" || ext === "xlsx" || ext === "xls" ? await getStoredStatementPassword(statement.id).catch(() => null) : null;
+
   if (ext === "pdf") {
-    const buffer = base64ToArrayBuffer(statement.content_base64);
-    const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+    const { buffer, password: resolvedPassword } = await getStatementFileBytes(statement, password);
+    const pdf = await pdfjsLib.getDocument({ data: buffer.slice(0), password: resolvedPassword || undefined }).promise;
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
       const viewport = page.getViewport({ scale: 1.3 });
@@ -278,7 +283,8 @@ async function renderStatementPreview(body, statement) {
     const rows = parseCsvContent(base64ToText(statement.content_base64));
     body.appendChild(buildStatementPreviewTable(rows));
   } else if (ext === "xlsx" || ext === "xls") {
-    const workbook = window.XLSX.read(new Uint8Array(base64ToArrayBuffer(statement.content_base64)), { type: "array" });
+    const { buffer } = await getStatementFileBytes(statement, password);
+    const workbook = window.XLSX.read(new Uint8Array(buffer), { type: "array" });
     const sheetName = workbook.SheetNames[0];
     const worksheet = sheetName ? workbook.Sheets[sheetName] : null;
     const rows = worksheet
@@ -306,7 +312,7 @@ async function openStatementViewer(statementId, filename) {
     await ensureStatementsDb();
     const rows = await invoke("plugin:sql|select", {
       db: STATEMENTS_DB,
-      query: "SELECT filename, file_type, content_base64, bank_name, account_last4, display_name FROM statements WHERE id = $1",
+      query: "SELECT id, filename, file_type, content_base64, bank_name, account_last4, display_name FROM statements WHERE id = $1",
       values: [statementId],
     });
     const statement = rows[0];
@@ -317,6 +323,11 @@ async function openStatementViewer(statementId, filename) {
     title.textContent = resolveStatementDisplayName(statement.display_name, statement.bank_name, statement.account_last4, statement.filename);
     await renderStatementPreview(body, statement);
   } catch (err) {
+    if (err instanceof PasswordRequiredError) {
+      body.className = "flex-1 overflow-auto p-4 flex items-center justify-center text-body-sm font-body-sm text-on-surface-variant";
+      body.textContent = "This file is password-protected. Use “Unlock” on the Statements screen to view it.";
+      return;
+    }
     console.error(`Failed to load statement ${statementId}`, err);
     body.className = "flex-1 overflow-auto p-4 flex items-center justify-center text-body-sm font-body-sm text-error";
     body.textContent = "Failed to load this file.";
@@ -330,6 +341,7 @@ const STATEMENTS_DB = "sqlite:taxai.db";
 const MAX_STATEMENT_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const ALLOWED_STATEMENT_EXTENSIONS = new Set(["xlsx", "xls", "csv", "pdf"]);
 const STATEMENT_STATUS_FAILED_TO_PARSE = "failed_to_parse";
+const STATEMENT_STATUS_PASSWORD_REQUIRED = "password_required";
 
 let dbReadyPromise = null;
 function ensureStatementsDb() {
@@ -413,6 +425,190 @@ function showStatementError(message) {
   el.textContent = message;
   el.classList.remove("hidden");
 }
+
+// ================= Password Protection =================
+
+class PasswordRequiredError extends Error {
+  constructor() {
+    super("Password required");
+    this.name = "PasswordRequiredError";
+  }
+}
+
+const APP_SECRETS_MASTER_KEY_ID = "master_key";
+let masterKeyPromise = null;
+
+// Local, app-generated AES-GCM key used to encrypt stored statement passwords at rest. Generated
+// once and kept in the same local SQLite database (app_secrets table) - this protects against
+// casual inspection of a DB export/backup, but (since the key lives alongside what it encrypts)
+// not against an attacker with full read access to the app's local data directory.
+async function getOrCreateMasterKey() {
+  if (!masterKeyPromise) {
+    masterKeyPromise = (async () => {
+      await ensureStatementsDb();
+      const rows = await invoke("plugin:sql|select", {
+        db: STATEMENTS_DB,
+        query: "SELECT key_base64 FROM app_secrets WHERE id = $1",
+        values: [APP_SECRETS_MASTER_KEY_ID],
+      });
+      if (rows.length > 0) {
+        return crypto.subtle.importKey("raw", base64ToArrayBuffer(rows[0].key_base64), "AES-GCM", false, ["encrypt", "decrypt"]);
+      }
+      const key = await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
+      const raw = await crypto.subtle.exportKey("raw", key);
+      await invoke("plugin:sql|execute", {
+        db: STATEMENTS_DB,
+        query: "INSERT INTO app_secrets (id, key_base64, created_at) VALUES ($1, $2, $3)",
+        values: [APP_SECRETS_MASTER_KEY_ID, arrayBufferToBase64(raw), new Date().toISOString()],
+      });
+      return key;
+    })();
+  }
+  return masterKeyPromise;
+}
+
+async function encryptStoredPassword(password) {
+  const key = await getOrCreateMasterKey();
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ciphertext = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(password));
+  return { passwordEncrypted: arrayBufferToBase64(ciphertext), passwordIv: arrayBufferToBase64(iv.buffer) };
+}
+
+async function decryptStoredPassword(passwordEncryptedBase64, passwordIvBase64) {
+  const key = await getOrCreateMasterKey();
+  const iv = new Uint8Array(base64ToArrayBuffer(passwordIvBase64));
+  const plaintext = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, base64ToArrayBuffer(passwordEncryptedBase64));
+  return new TextDecoder().decode(plaintext);
+}
+
+async function saveStatementPassword(statementId, password) {
+  const { passwordEncrypted, passwordIv } = await encryptStoredPassword(password);
+  await ensureStatementsDb();
+  await invoke("plugin:sql|execute", {
+    db: STATEMENTS_DB,
+    query: "UPDATE statements SET password_encrypted = $1, password_iv = $2, status = 'saved' WHERE id = $3",
+    values: [passwordEncrypted, passwordIv, statementId],
+  });
+}
+
+// Looks up and decrypts a statement's stored password, or null if none is stored.
+async function getStoredStatementPassword(statementId) {
+  await ensureStatementsDb();
+  const rows = await invoke("plugin:sql|select", {
+    db: STATEMENTS_DB,
+    query: "SELECT password_encrypted, password_iv FROM statements WHERE id = $1",
+    values: [statementId],
+  });
+  const row = rows[0];
+  if (!row || !row.password_encrypted || !row.password_iv) return null;
+  return decryptStoredPassword(row.password_encrypted, row.password_iv);
+}
+
+// Shared access point for a statement's (possibly encrypted) file content. For unprotected files
+// and CSV, returns the original bytes unchanged. For a password-protected Excel file, returns
+// already-decrypted bytes ready for XLSX.read(). For a password-protected PDF, decryption happens
+// inside pdfjsLib.getDocument() itself, so this returns the original bytes plus the verified
+// password for the caller to pass through. Throws PasswordRequiredError (no password supplied for
+// a protected file) or IncorrectPasswordError (wrong password supplied).
+async function getStatementFileBytes(statement, password) {
+  const buffer = base64ToArrayBuffer(statement.content_base64);
+  const ext = (statement.file_type || "").toLowerCase();
+
+  if (ext === "xlsx" || ext === "xls") {
+    try {
+      window.XLSX.read(new Uint8Array(buffer), { type: "array" });
+      return { buffer, password: null };
+    } catch (err) {
+      if (!/password-protected/i.test((err && err.message) || "")) throw err;
+    }
+    if (!password) throw new PasswordRequiredError();
+    const decrypted = await decryptExcelBuffer(new Uint8Array(buffer), password, ext);
+    return { buffer: decrypted, password: null };
+  }
+
+  if (ext === "pdf") {
+    try {
+      await pdfjsLib.getDocument({ data: buffer.slice(0), password: password || undefined }).promise;
+      return { buffer, password: password || null };
+    } catch (err) {
+      if (!(err instanceof pdfjsLib.PasswordException)) throw err;
+      if (err.code === pdfjsLib.PasswordResponses.INCORRECT_PASSWORD) throw new IncorrectPasswordError();
+      throw new PasswordRequiredError();
+    }
+  }
+
+  return { buffer, password: null };
+}
+
+// ================= Password prompt modal =================
+
+// Holds the active prompt's submit handler while the modal is open (rebuilt fresh on every
+// promptForPassword() call); null when no prompt is showing. Kept separate from the outer
+// Promise's own resolve function, which each attemptSubmit closure calls directly.
+let activePasswordPrompt = null;
+
+function closePasswordPrompt() {
+  document.getElementById("statement-password-overlay")?.classList.add("hidden");
+  activePasswordPrompt = null;
+}
+
+// Shows the password modal for `subtitle` (typically a filename); resolves with the entered
+// password string, or null if the user cancels. Automatically retries on IncorrectPasswordError
+// thrown by `attemptFn(password)`, showing an inline error and keeping the modal open.
+function promptForPassword(subtitle, attemptFn) {
+  const overlay = document.getElementById("statement-password-overlay");
+  const subtitleEl = document.getElementById("statement-password-subtitle");
+  const input = document.getElementById("statement-password-input");
+  const errorEl = document.getElementById("statement-password-error");
+  if (!overlay || !input) return Promise.resolve(null);
+
+  subtitleEl.textContent = subtitle || "";
+  input.value = "";
+  errorEl.classList.add("hidden");
+  errorEl.textContent = "";
+  overlay.classList.remove("hidden");
+
+  return new Promise((resolveOuter) => {
+    async function attemptSubmit(password) {
+      if (password === null) {
+        closePasswordPrompt();
+        resolveOuter(null);
+        return;
+      }
+      try {
+        await attemptFn(password);
+        closePasswordPrompt();
+        resolveOuter(password);
+      } catch (err) {
+        if (err instanceof IncorrectPasswordError) {
+          errorEl.textContent = "Incorrect password. Try again.";
+          errorEl.classList.remove("hidden");
+          input.value = "";
+          input.focus();
+          // activePasswordPrompt keeps pointing at this same attemptSubmit - modal stays open
+        } else {
+          console.error("Password verification failed", err);
+          errorEl.textContent = "Something went wrong verifying this password.";
+          errorEl.classList.remove("hidden");
+        }
+      }
+    }
+    activePasswordPrompt = attemptSubmit;
+    input.focus();
+  });
+}
+
+document.getElementById("statement-password-form")?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const input = document.getElementById("statement-password-input");
+  activePasswordPrompt?.(input.value);
+});
+document.getElementById("statement-password-cancel")?.addEventListener("click", () => {
+  activePasswordPrompt?.(null);
+});
+document.getElementById("statement-password-overlay")?.addEventListener("click", (event) => {
+  if (event.target.id === "statement-password-overlay") activePasswordPrompt?.(null);
+});
 
 // ================= Transaction Extraction =================
 
@@ -653,8 +849,8 @@ const PDF_TRANSACTION_LINE_RE =
 const PDF_TYPED_TRANSACTION_LINE_RE =
   /^(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}-\d{2}-\d{2})\s+(.+?)\s+(credit|debit|monthly installments)\s+([\d,]+\.\d{2})$/i;
 
-async function extractPdfTransactions(buffer) {
-  const doc = await pdfjsLib.getDocument({ data: buffer }).promise;
+async function extractPdfTransactions(buffer, password) {
+  const doc = await pdfjsLib.getDocument({ data: buffer, password: password || undefined }).promise;
   const transactions = [];
 
   for (let pageNum = 1; pageNum <= doc.numPages; pageNum++) {
@@ -726,7 +922,7 @@ function detectAccountType(rawText, filename) {
 // live (title, branch, IFSC, account number) - transaction narrations after that point routinely
 // mention *other* people's banks (UPI/NEFT counterparties), so keeping the two separate avoids
 // picking up a counterparty's bank/account as if it were the statement owner's.
-async function getStatementTextSections(statement) {
+async function getStatementTextSections(statement, password) {
   const splitPreamble = (rows) => {
     const headerIdx = findHeaderRowIndex(rows);
     const preambleRows = headerIdx === -1 ? rows : rows.slice(0, headerIdx);
@@ -737,7 +933,8 @@ async function getStatementTextSections(statement) {
     return splitPreamble(parseCsvContent(base64ToText(statement.content_base64)));
   }
   if (statement.file_type === "xlsx" || statement.file_type === "xls") {
-    const workbook = window.XLSX.read(new Uint8Array(base64ToArrayBuffer(statement.content_base64)), { type: "array" });
+    const { buffer } = await getStatementFileBytes(statement, password);
+    const workbook = window.XLSX.read(new Uint8Array(buffer), { type: "array" });
     const parts = workbook.SheetNames.map((name) =>
       splitPreamble(
         window.XLSX.utils
@@ -751,7 +948,8 @@ async function getStatementTextSections(statement) {
     };
   }
   if (statement.file_type === "pdf") {
-    const doc = await pdfjsLib.getDocument({ data: base64ToArrayBuffer(statement.content_base64) }).promise;
+    const { buffer, password: resolvedPassword } = await getStatementFileBytes(statement, password);
+    const doc = await pdfjsLib.getDocument({ data: buffer.slice(0), password: resolvedPassword || undefined }).promise;
     const pageTexts = [];
     for (let pageNum = 1; pageNum <= doc.numPages; pageNum++) {
       const page = await doc.getPage(pageNum);
@@ -885,38 +1083,64 @@ function detectAccountLast4(preambleText, fullText, filename) {
 }
 
 async function extractTransactionsForStatement(statement) {
+  // Password-protected statements are unlocked automatically here using their stored password
+  // (set during upload or via the "Unlock" action) - no prompt is shown on this path.
+  const password = statement.id ? await getStoredStatementPassword(statement.id).catch(() => null) : null;
+
   let accountType = "unknown";
   let bankName = null;
   let accountLast4 = null;
   let currency = "INR";
+  let passwordNeeded = false;
   try {
-    const { fullText, preambleText } = await getStatementTextSections(statement);
+    const { fullText, preambleText } = await getStatementTextSections(statement, password);
     accountType = detectAccountType(fullText, statement.filename);
     bankName = detectBankName(fullText, statement.filename);
     accountLast4 = detectAccountLast4(preambleText, fullText, statement.filename);
     currency = detectCurrency(fullText);
   } catch (err) {
-    console.error(`Failed to detect account metadata for statement ${statement.id}`, err);
+    if (err instanceof PasswordRequiredError || err instanceof IncorrectPasswordError) {
+      passwordNeeded = true;
+    } else {
+      console.error(`Failed to detect account metadata for statement ${statement.id}`, err);
+    }
   }
   const isCreditCard = accountType === "credit_card";
 
   let rows = [];
   let parseFailed = false;
-  try {
-    if (statement.file_type === "xlsx" || statement.file_type === "xls") {
-      rows = await extractExcelTransactions(base64ToArrayBuffer(statement.content_base64), isCreditCard);
-    } else if (statement.file_type === "csv") {
-      rows = extractCsvTransactions(base64ToText(statement.content_base64), isCreditCard);
-    } else if (statement.file_type === "pdf") {
-      rows = await extractPdfTransactions(base64ToArrayBuffer(statement.content_base64));
+  if (!passwordNeeded) {
+    try {
+      if (statement.file_type === "xlsx" || statement.file_type === "xls") {
+        const { buffer } = await getStatementFileBytes(statement, password);
+        rows = await extractExcelTransactions(buffer, isCreditCard);
+      } else if (statement.file_type === "csv") {
+        rows = extractCsvTransactions(base64ToText(statement.content_base64), isCreditCard);
+      } else if (statement.file_type === "pdf") {
+        const { buffer, password: resolvedPassword } = await getStatementFileBytes(statement, password);
+        rows = await extractPdfTransactions(buffer, resolvedPassword);
+      }
+    } catch (err) {
+      if (err instanceof PasswordRequiredError || err instanceof IncorrectPasswordError) {
+        passwordNeeded = true;
+      } else {
+        console.error(`Failed to extract transactions for statement ${statement.id}`, err);
+        parseFailed = true;
+      }
+      rows = [];
     }
-  } catch (err) {
-    console.error(`Failed to extract transactions for statement ${statement.id}`, err);
-    parseFailed = true;
-    rows = [];
   }
 
   await ensureStatementsDb();
+
+  if (passwordNeeded) {
+    await invoke("plugin:sql|execute", {
+      db: STATEMENTS_DB,
+      query: "UPDATE statements SET status = $1 WHERE id = $2",
+      values: [STATEMENT_STATUS_PASSWORD_REQUIRED, statement.id],
+    });
+    return;
+  }
 
   if (parseFailed) {
     await invoke("plugin:sql|execute", {
@@ -991,17 +1215,45 @@ async function saveStatementFile(file) {
     return;
   }
 
+  // Password-protected Excel/PDF files are detected and unlocked before saving, so they behave
+  // like unprotected files from here on. Cancelling (or exhausting retries) still saves the file,
+  // with status "Password required", so the upload isn't lost - the user can unlock it later.
+  const probeStatement = { file_type: ext, content_base64: contentBase64 };
+  let verifiedPassword = null;
+  let needsPassword = false;
+  try {
+    await getStatementFileBytes(probeStatement, null);
+  } catch (err) {
+    if (err instanceof PasswordRequiredError) {
+      needsPassword = true;
+    }
+    // Any other error (corrupt/unrecognized content) is left for extractTransactionsForStatement
+    // to rediscover and reflect as "Failed to parse", matching today's behavior.
+  }
+  if (needsPassword) {
+    verifiedPassword = await promptForPassword(file.name, (password) => getStatementFileBytes(probeStatement, password));
+  }
+
+  const status = needsPassword && verifiedPassword === null ? STATEMENT_STATUS_PASSWORD_REQUIRED : "saved";
+
   try {
     await invoke("plugin:sql|execute", {
       db: STATEMENTS_DB,
       query:
         "INSERT INTO statements (id, filename, file_type, size_bytes, content_base64, content_hash, status, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-      values: [id, file.name, ext, file.size, contentBase64, contentHash, "saved", createdAt],
+      values: [id, file.name, ext, file.size, contentBase64, contentHash, status, createdAt],
     });
   } catch (err) {
     showStatementError(`Failed to save "${file.name}".`);
     console.error(err);
     return;
+  }
+
+  if (verifiedPassword !== null) {
+    await saveStatementPassword(id, verifiedPassword);
+  }
+  if (status === STATEMENT_STATUS_PASSWORD_REQUIRED) {
+    return; // no password supplied - skip extraction until the user unlocks it
   }
 
   await extractTransactionsForStatement({ id, filename: file.name, file_type: ext, content_base64: contentBase64 });
@@ -1013,6 +1265,26 @@ async function saveStatementFiles(fileList) {
   for (const file of files) {
     await saveStatementFile(file);
   }
+  await renderStatements();
+}
+
+// Prompts for the password on a "Password required" statement; on success, stores it and
+// re-runs extraction, bringing the statement to the same state as if it had unlocked on upload.
+async function unlockStatement(statementId, filename) {
+  await ensureStatementsDb();
+  const rows = await invoke("plugin:sql|select", {
+    db: STATEMENTS_DB,
+    query: "SELECT id, filename, file_type, content_base64 FROM statements WHERE id = $1",
+    values: [statementId],
+  });
+  const statement = rows[0];
+  if (!statement) return;
+
+  const verifiedPassword = await promptForPassword(filename || statement.filename, (password) => getStatementFileBytes(statement, password));
+  if (verifiedPassword === null) return; // cancelled - leave status as Password required
+
+  await saveStatementPassword(statementId, verifiedPassword);
+  await extractTransactionsForStatement(statement);
   await renderStatements();
 }
 
@@ -1133,6 +1405,12 @@ document.getElementById("statement-table-body")?.addEventListener("click", async
     return;
   }
 
+  const unlockBtn = event.target.closest("button[data-unlock-statement-id]");
+  if (unlockBtn) {
+    unlockStatement(unlockBtn.dataset.unlockStatementId, unlockBtn.dataset.unlockStatementName);
+    return;
+  }
+
   const badge = event.target.closest("button[data-account-type-id]");
   if (!badge) return;
 
@@ -1173,12 +1451,19 @@ function statementRowMarkup(row, fyLabel, collapsed) {
   const checked = selectedStatementIds.has(row.id) ? "checked" : "";
   const failedBadge = (label) =>
     `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-surface-container-high border border-error/30 text-mono-data-sm text-error font-medium"><span class="w-1.5 h-1.5 rounded-full bg-error"></span> ${label}</span>`;
+  const passwordRequiredBadge = `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-surface-container-high border border-warning/30 text-mono-data-sm text-warning font-medium"><span class="material-symbols-outlined text-[14px]">lock</span> Password required</span>`;
   const statusBadge =
     row.status === "saved"
       ? `<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-surface-container-high border border-outline-variant text-mono-data-sm text-on-surface"><span class="w-1.5 h-1.5 rounded-full bg-success"></span> Saved</span>`
       : row.status === STATEMENT_STATUS_FAILED_TO_PARSE
         ? failedBadge("Failed to parse")
-        : failedBadge("Failed");
+        : row.status === STATEMENT_STATUS_PASSWORD_REQUIRED
+          ? passwordRequiredBadge
+          : failedBadge("Failed");
+  const unlockButton =
+    row.status === STATEMENT_STATUS_PASSWORD_REQUIRED
+      ? `<button type="button" class="mt-1 text-label-caps font-label-caps text-data-blue hover:underline" data-unlock-statement-id="${row.id}" data-unlock-statement-name="${escapeHtml(row.filename)}">Unlock</button>`
+      : "";
   const displayName = resolveStatementDisplayName(row.display_name, row.bank_name, row.account_last4, row.filename);
   const fileLink = `<button type="button" class="mt-0.5 block text-label-caps font-label-caps text-data-blue hover:underline truncate max-w-[220px] text-left" data-view-statement-id="${row.id}" data-view-statement-name="${escapeHtml(displayName)}">${displayName !== row.filename ? escapeHtml(row.filename) : "View file"}</button>`;
   return `<tr class="hover:bg-surface-container-low transition-colors group cursor-default ${collapsed ? "hidden" : ""}" data-row-id="${row.id}" data-fy-group="${escapeHtml(fyLabel)}">
@@ -1195,7 +1480,7 @@ function statementRowMarkup(row, fyLabel, collapsed) {
       </td>
       <td class="p-table-cell-padding text-mono-data font-mono-data text-right text-on-surface-variant">${formatStatementDate(row.created_at)}</td>
       <td class="p-table-cell-padding text-mono-data font-mono-data text-right text-on-surface-variant">${formatStatementSize(row.size_bytes)}</td>
-      <td class="p-table-cell-padding">${statusBadge}</td>
+      <td class="p-table-cell-padding">${statusBadge}${unlockButton}</td>
       <td class="p-table-cell-padding">${accountTypeBadgeMarkup(row.id, row.account_type)}</td>
     </tr>`;
 }

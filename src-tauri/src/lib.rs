@@ -106,6 +106,18 @@ pub fn run() {
             CREATE UNIQUE INDEX IF NOT EXISTS idx_group_suggestion_dismissals_signature ON group_suggestion_dismissals (signature);",
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 12,
+            description: "add stored-password support for password-protected statements",
+            sql: "ALTER TABLE statements ADD COLUMN password_encrypted TEXT;
+            ALTER TABLE statements ADD COLUMN password_iv TEXT;
+            CREATE TABLE IF NOT EXISTS app_secrets (
+                id TEXT PRIMARY KEY,
+                key_base64 TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );",
+            kind: MigrationKind::Up,
+        },
     ];
 
     tauri::Builder::default()
